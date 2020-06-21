@@ -7,6 +7,7 @@
 #include <iterator> 
 #include<iostream>
 #include<string>
+#include <algorithm>
 using namespace std;
 
 class Movie {
@@ -22,6 +23,14 @@ public:
     void print()
     {
         cout << "Title: "<< title << "\n" << "Genre: " << genre << "\n";
+    }
+    string get_genre()
+    {
+        return genre;
+    }
+    list <string> get_people()
+    {
+        return people;
     }
 };
 
@@ -56,12 +65,64 @@ public:
     {
         print_list(loM);
     }
+    void show_list(string genre) {
+        std::list <Movie> loM_genre;
+
+        list <Movie> ::iterator it;
+        list <Movie> ::iterator it_genre = loM_genre.end();
+        for (it = loM.begin();
+            it != loM.end();
+            it++)
+        {
+            Movie m = *it;
+            if (m.get_genre() == genre) {
+                loM_genre.insert(it_genre, m);
+            }
+        }
+        cout << "\n";
+        print_list(loM_genre);
+    }
+    void show_list(list <string> loP_watching) {
+        std::list <Movie> loM_P;
+        list <string> people_who_like_movie;
+
+        list <Movie> ::iterator it_loM;
+        list <Movie> ::iterator it_people = loM_P.end();
+        for (it_loM = loM.begin();
+            it_loM != loM.end();
+            it_loM++)
+        {
+            Movie m = *it_loM;
+            bool peeps = true;
+            people_who_like_movie = m.get_people();
+            list <string> ::iterator it_loP; //= loP_watching.begin();
+            for (it_loP = loP_watching.begin(); it_loP != loP_watching.end(); it_loP++) {
+                list <string>::iterator it_str;
+                string person = *it_loP;
+                it_str = std::find(people_who_like_movie.begin(), people_who_like_movie.end(), person);
+
+                if (it_str != people_who_like_movie.end()) {
+                    peeps = peeps;
+                }
+                else {
+                    peeps = false;
+                }
+            }
+
+            if (peeps) {
+                loM_P.insert(it_people, m);
+            }
+        }
+        cout << "\n";
+        print_list(loM_P);
+    }
 };
 
 ListOfMovies new_movie(ListOfMovies loM)
 {
     std::list <std::string> loP;
     std::string title, genre, person, answer;
+    person = "";
     std::cout << "What is the title of the movie? ";
     cin.ignore();
     getline(cin, title);
@@ -70,8 +131,10 @@ ListOfMovies new_movie(ListOfMovies loM)
     bool done = false;
     while (!done)
     {
+        //cin.get();
         std::cout << "Who likes this movie? ";
-        getline(cin, person);
+        //getchar(cin, letter);
+        getline(cin >> ws, person);
         loP.push_back(person);
         std::cout << "More people? (Y/N) ";
         std::cin >> answer;
@@ -89,7 +152,45 @@ ListOfMovies new_movie(ListOfMovies loM)
 
 void pick_movie(ListOfMovies loM)
 {
-    loM.show_list();
+    //loM.show_list();
+    int num;
+    std::cout << "How are you picking your movie?\n";
+    std::cout << "1 - By Genre\n";
+    std::cout << "2 - By Who is Watching\n";
+    std::cin >> num;
+
+    if (num == 1) {
+        string genre;
+        std::cout << "What genre are you picking? ";
+        std::cin >> genre;
+        loM.show_list(genre);
+    }
+    else if (num == 2) {
+        std::list <string> loP;
+        std::string person;
+        std::string answer;
+        bool done = false;
+        std::list <string> loP_watching;
+        while (!done)
+        {
+            std::string person;
+            std::string answer;
+            std::cout << "Who is watching? ";
+            getchar();
+            getline(cin, person);
+            loP_watching.push_back(person);
+            std::cout << "More people? (Y/N) \n";
+            std::cin >> answer;
+            if (answer == "N") {
+                done = true;
+            }
+        }
+        loM.show_list(loP_watching);
+    }
+    else {
+        system("CLS");
+        std::cout << "I don't know that command please try again\n\n";
+    }
 }
 
 int main()
